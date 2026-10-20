@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /kontakt.php
+
+Sitemap: https://www.weigl-social.de/sitemap.xml
