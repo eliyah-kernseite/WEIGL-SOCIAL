@@ -123,7 +123,7 @@
   });
 
   /* ---------- Einblenden beim Scrollen ---------- */
-  var rvs = document.querySelectorAll(".rv, .steps, .feature__media");
+  var rvs = document.querySelectorAll(".rv, .feature__media");
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
@@ -229,7 +229,6 @@
     else if (e.target.closest(".a11y__reset")) { prefs = { fs: 100, hc: false, rm: false }; }
     else return;
     applyPrefs(); syncUI();
-    if (tg && tg.dataset.toggle === "rm") balloons.refresh();
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !panel.hidden) { openPanel(false); aBtn.focus(); }
@@ -237,94 +236,68 @@
   document.addEventListener("click", function (e) { if (!panel.hidden && !a11y.contains(e.target)) openPanel(false); });
   applyPrefs(); syncUI();
 
-  /* ---------- Footer: Heliumballons hinter der Wortmarke ---------- */
+  /* ---------- Footer: Buchstaben werden zu Folienballons ---------- */
   var balloons = (function () {
     var wrap = document.querySelector(".balloon");
     var api = { refresh: function () {} };
     if (!wrap) return api;
-    var canvas = wrap.querySelector("canvas");
-    var ctx = canvas.getContext("2d");
-    var COLORS = ["#feda75", "#fa7e1e", "#d62976", "#962fbf", "#4f5bd5", "#f56040", "#c13584"];
-    var blobs = [], raf = 0, last = { x: -999, y: -999 }, dpr = 1, W = 0, H = 0, scale = 1, hintShown = false;
+    var letters = Array.prototype.slice.call(wrap.querySelectorAll(".bl"));
+    var word = wrap.querySelector(".balloon__word");
+    var filt = document.getElementById("puff");
+    var pointer = null, raf = 0, LIFE = 1500;
 
-    function size() {
-      var r = canvas.getBoundingClientRect();
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = r.width; H = r.height; scale = Math.max(.55, Math.min(1.25, W / 1300));
-      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-    function shade(hex, amt) {
-      var n = parseInt(hex.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
-      function c(v) { return Math.max(0, Math.min(255, Math.round(amt > 0 ? v + (255 - v) * amt : v * (1 + amt)))); }
-      return "rgb(" + c(r) + "," + c(g) + "," + c(b) + ")";
-    }
-    function spawn(x, y, big) {
-      if (blobs.length > 70) blobs.shift();
-      var col = COLORS[Math.floor(Math.random() * COLORS.length)];
-      blobs.push({
-        x: x + (Math.random() - .5) * 26, y: y + (Math.random() - .5) * 18,
-        R: (big ? 62 : 34 + Math.random() * 40) * scale,
-        vx: (Math.random() - .5) * .5, vy: -(.25 + Math.random() * .55),
-        ph: Math.random() * 6.28, born: performance.now(), life: 3400 + Math.random() * 2600,
-        c0: shade(col, .55), c1: col, c2: shade(col, -.35)
+    // Der Filter ist für 126 px Ballonschrift abgestimmt und wird auf die echte Größe umgerechnet
+    function scaleFilter() {
+      if (!filt) return;
+      var k = parseFloat(getComputedStyle(word).fontSize) * 0.74 / 126;
+      filt.querySelectorAll("[data-k]").forEach(function (el) {
+        var v = (parseFloat(el.getAttribute("data-k")) * k).toFixed(2);
+        el.setAttribute(el.tagName.toLowerCase() === "femorphology" ? "radius" : "stdDeviation", v);
       });
-      if (!raf) raf = requestAnimationFrame(tick);
+      filt.querySelectorAll("[data-ks]").forEach(function (el) { el.setAttribute("surfaceScale", (parseFloat(el.getAttribute("data-ks")) * k).toFixed(2)); });
+      filt.querySelectorAll("[data-kdy]").forEach(function (el) { el.setAttribute("dy", (parseFloat(el.getAttribute("data-kdy")) * k).toFixed(2)); });
     }
-    function easeOutBack(t) { var c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
-    function tick(now) {
-      ctx.clearRect(0, 0, W, H);
-      for (var i = blobs.length - 1; i >= 0; i--) {
-        var b = blobs[i], age = now - b.born;
-        if (age > b.life) { blobs.splice(i, 1); continue; }
-        var grow = Math.min(1, age / 750), shrink = age > b.life - 700 ? (b.life - age) / 700 : 1;
-        var r = b.R * easeOutBack(grow) * Math.max(0, shrink);
-        b.x += b.vx + Math.sin(now / 900 + b.ph) * .25;
-        b.y += b.vy; b.vy *= .998;
-        if (r <= .5) continue;
-        var g = ctx.createRadialGradient(b.x - r * .35, b.y - r * .45, r * .08, b.x, b.y, r * 1.1);
-        g.addColorStop(0, b.c0); g.addColorStop(.5, b.c1); g.addColorStop(1, b.c2);
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        // leicht ovale Ballonform, die sanft „atmet“
-        ctx.ellipse(b.x, b.y, r * (1 + Math.sin(now / 500 + b.ph) * .04), r * (1.12 + Math.cos(now / 600 + b.ph) * .04), 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      raf = blobs.length ? requestAnimationFrame(tick) : 0;
-      if (!raf) ctx.clearRect(0, 0, W, H);
+    function loop(now) {
+      var anyUp = false;
+      letters.forEach(function (l) {
+        if (pointer) {
+          var r = l.getBoundingClientRect();
+          var dx = pointer.x - (r.left + r.width / 2), dy = (pointer.y - (r.top + r.height / 2)) * 1.2;
+          if (Math.sqrt(dx * dx + dy * dy) < Math.max(r.width * 1.05, 60)) l._t = now;
+        }
+        var on = l._t !== undefined && now - l._t < LIFE;
+        l.classList.toggle("is-up", on);
+        if (on) anyUp = true;
+      });
+      raf = (anyUp || pointer) ? requestAnimationFrame(loop) : 0;
     }
-    function local(e) { var r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
-    function onMove(e) {
-      if (motionOff()) return;
-      var p = local(e), dx = p.x - last.x, dy = p.y - last.y;
-      if (dx * dx + dy * dy > 22 * 22 * scale) { spawn(p.x, p.y); last = p; }
+    function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+    function at(e) { pointer = { x: e.clientX, y: e.clientY }; kick(); }
+    wrap.addEventListener("pointermove", at);
+    wrap.addEventListener("pointerleave", function () { pointer = null; kick(); });
+    wrap.addEventListener("pointerdown", function (e) {
+      at(e);
+      if (e.pointerType !== "mouse") setTimeout(function () { pointer = null; }, 80);
+    });
+    if (window.matchMedia("(hover: none)").matches) {
+      var hintEl = wrap.querySelector(".balloon__hint");
+      if (hintEl) hintEl.textContent = "Tipp mal drauf";
     }
-    function onDown(e) {
-      if (motionOff()) return;
-      var p = local(e);
-      for (var k = 0; k < 6; k++) spawn(p.x + (Math.random() - .5) * 90 * scale, p.y + (Math.random() - .5) * 50 * scale, k === 0);
-    }
-    function hint() {
-      if (hintShown || motionOff()) return;
-      hintShown = true;
-      var word = wrap.querySelector(".balloon__word").getBoundingClientRect(), cr = canvas.getBoundingClientRect();
-      for (var k = 0; k < 9; k++) {
-        (function (k) {
-          setTimeout(function () {
-            spawn(word.left - cr.left + word.width * (.08 + k * .1), word.top - cr.top + word.height * (.45 + Math.sin(k) * .2), k % 3 === 0);
-          }, k * 110);
-        })(k);
-      }
-    }
-    size();
-    window.addEventListener("resize", size);
-    wrap.addEventListener("pointermove", onMove);
-    wrap.addEventListener("pointerdown", onDown);
+    // Einmalige Welle, sobald die Wortmarke ins Bild kommt
     if ("IntersectionObserver" in window) {
-      var hio = new IntersectionObserver(function (en) { if (en[0].isIntersecting) { hint(); hio.disconnect(); } }, { threshold: .6 });
+      var hio = new IntersectionObserver(function (en) {
+        if (!en[0].isIntersecting) return;
+        hio.disconnect();
+        if (motionOff()) return;
+        letters.forEach(function (l, i) {
+          setTimeout(function () { l._t = performance.now(); kick(); }, 250 + i * 120);
+        });
+      }, { threshold: .7 });
       hio.observe(wrap);
     }
-    api.refresh = function () { if (motionOff()) { blobs = []; ctx.clearRect(0, 0, W, H); } };
+    scaleFilter();
+    window.addEventListener("resize", scaleFilter);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scaleFilter);
     return api;
   })();
 
