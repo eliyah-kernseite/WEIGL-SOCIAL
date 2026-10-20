@@ -32,7 +32,7 @@ Empfänger und Absender stehen oben in `kontakt.php` (`MAIL_TO`, `MAIL_FROM`).
 
 ## Bilder
 
-Alle Fotos stammen von Unsplash (Unsplash-Lizenz, kommerzielle Nutzung erlaubt) und liegen lokal als WebP in `assets/img/`. Die Fotografinnen und Fotografen sind im Impressum unter „Bildnachweis“ genannt. Das Bild auf „Über mich“ ist ein Platzhalter und soll durch ein Porträt von Emily ersetzt werden.
+Alle Fotos stammen von Unsplash (Unsplash-Lizenz, kommerzielle Nutzung erlaubt) und liegen lokal als WebP in `assets/img/`. Die Fotografinnen und Fotografen sind im Impressum unter „Bildnachweis“ genannt. Ausnahme: die Porträts von Emily (`emily-*.webp`) sind eigene Fotos.
 
 ## Schriften
 
