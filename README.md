@@ -26,6 +26,10 @@ Statische Multi-Page-Website für **www.weigl-social.de**: reines HTML, CSS und 
 
 Empfänger und Absender stehen oben in `kontakt.php` (`MAIL_TO`, `MAIL_FROM`).
 
+## Saubere Adressen
+
+Alle Seiten sind ohne `.html` erreichbar, z. B. `https://www.weigl-social.de/leistungen`. Die `.htaccess` liefert dafür intern `leistungen.html` aus und leitet alte Aufrufe mit `.html` per 301 auf die saubere Adresse um. Links, Canonical-Tags und Sitemap verwenden nur die sauberen Adressen.
+
 ## Nach dem Livegang
 
 - In der Google Search Console die Domain bestätigen und `https://www.weigl-social.de/sitemap.xml` einreichen.

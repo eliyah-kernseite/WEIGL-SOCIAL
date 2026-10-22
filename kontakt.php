@@ -1,7 +1,7 @@
 <?php
 /**
  * WEIGL SOCIAL – Kontaktformular
- * Nimmt Anfragen aus kontakt.html entgegen und schickt sie per E-Mail weiter.
+ * Nimmt Anfragen von der Kontaktseite (/kontakt) entgegen und schickt sie per E-Mail weiter.
  * Läuft auf jedem Webspace mit PHP (z. B. Hostinger) ohne weitere Abhängigkeiten.
  */
 
@@ -26,7 +26,7 @@ function respond(bool $ok, string $message, array $errors = [], int $status = 20
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode(['ok' => $ok, 'message' => $message, 'errors' => (object) $errors], JSON_UNESCAPED_UNICODE);
     } else {
-        header('Location: ' . ($ok ? 'danke.html' : 'kontakt.html?fehler=1'), true, 303);
+        header('Location: ' . ($ok ? '/danke' : '/kontakt?fehler=1'), true, 303);
     }
     exit;
 }

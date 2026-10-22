@@ -1,6 +1,6 @@
 # WEIGL SOCIAL – Server-Einstellungen (Apache / LiteSpeed, z. B. Hostinger)
 
-Options -Indexes
+Options -Indexes -MultiViews
 DirectoryIndex index.html
 ErrorDocument 404 /404.html
 
@@ -15,6 +15,20 @@ ErrorDocument 404 /404.html
   # /index.html auf / umleiten (eine kanonische Startseite)
   RewriteCond %{THE_REQUEST} \s/index\.html[\s?] [NC]
   RewriteRule ^index\.html$ / [L,R=301]
+
+  # Saubere Adressen: /leistungen.html -> /leistungen (nur bei direktem Aufruf, keine Schleife)
+  RewriteCond %{THE_REQUEST} \s/([a-z0-9-]+)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [L,R=301,NE]
+
+  # Schrägstrich am Ende entfernen: /leistungen/ -> /leistungen
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.+)/$ /$1 [L,R=301]
+
+  # /leistungen intern aus leistungen.html ausliefern
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^([a-z0-9-]+)$ $1.html [L]
 
   # Interne Dateien nicht ausliefern
   RewriteRule ^(README\.md|\.git) - [F,L,NC]
