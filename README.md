@@ -20,9 +20,9 @@ Statische Multi-Page-Website für **www.weigl-social.de**: reines HTML, CSS und 
 
 1. In hPanel unter **Websites → Verwalten → Git** dieses Repository verbinden, Branch `main`, Installationspfad leer lassen (= `public_html`).
 2. Bereitstellen. Alle Dateien liegen im Hauptordner des Repositorys, es gibt nichts zu bauen.
-3. In hPanel unter **E-Mails** das Postfach `kontakt@weigl-social.de` anlegen. Es dient als Absender der Formular-Mails (ohne Postfach der eigenen Domain landen Mails oft im Spam).
+3. In hPanel unter **E-Mails** das Postfach `info@weigl-social.de` anlegen (falls noch nicht vorhanden). Es empfängt die Formular-Anfragen und dient zugleich als Absender (ohne Postfach der eigenen Domain landen Mails oft im Spam).
 4. SSL-Zertifikat für die Domain aktivieren. Die `.htaccess` leitet danach automatisch auf `https://www.weigl-social.de` um.
-5. Einmal das Formular auf der Live-Seite testen und prüfen, ob die Mail bei `weigl.social@gmail.com` ankommt (auch im Spam-Ordner nachsehen).
+5. Einmal das Formular auf der Live-Seite testen und prüfen, ob die Mail bei `info@weigl-social.de` ankommt (auch im Spam-Ordner nachsehen).
 
 Empfänger und Absender stehen oben in `kontakt.php` (`MAIL_TO`, `MAIL_FROM`).
 

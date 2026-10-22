@@ -738,3 +738,7 @@ html.hc .is-color img { filter: grayscale(1) contrast(1.25) !important; }
 .legal__next { margin-top: 40px; }
 @media (max-width: 640px) { .ldl > div { grid-template-columns: 1fr; gap: 2px; } }
 html.hc .lsec__body > p, html.hc .ldl dt { color: inherit; }
+.ftr__grid { grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr)); gap: 36px; }
+@media (max-width: 1100px) { .ftr__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .ftr__grid > :first-child { grid-column: 1 / -1; } }
+@media (max-width: 640px) { .ftr__grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 420px) { .ftr__grid { grid-template-columns: 1fr; } }

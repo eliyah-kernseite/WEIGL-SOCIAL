@@ -6,8 +6,8 @@
  */
 
 // ---- Einstellungen ----------------------------------------------------------
-const MAIL_TO      = 'weigl.social@gmail.com';        // hier kommen die Anfragen an
-const MAIL_FROM    = 'kontakt@weigl-social.de';       // Absender: muss ein Postfach der eigenen Domain sein
+const MAIL_TO      = 'info@weigl-social.de';          // hier kommen die Anfragen an
+const MAIL_FROM    = 'info@weigl-social.de';          // Absender: muss ein Postfach der eigenen Domain sein
 const MAIL_SUBJECT = 'Neue Anfrage über weigl-social.de';
 const MIN_SECONDS  = 3;                               // schneller ausgefüllt = vermutlich Bot
 const MAX_PER_HOUR = 5;                               // Anfragen pro Besucher (IP) und Stunde
