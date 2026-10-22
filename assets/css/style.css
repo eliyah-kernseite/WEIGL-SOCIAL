@@ -576,7 +576,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ftr a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .ftr__grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 40px; }
 .ftr__claim { font-family: var(--serif); font-size: clamp(2rem, 3vw, 2.8rem); line-height: 1.05; font-style: italic; font-weight: 300; }
-.ftr h2 { font-family: var(--sans); font-size: .7rem; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--mist); margin-bottom: 18px; }
+.ftr h2, .ftr__h { font-family: var(--sans); font-size: .7rem; font-weight: 600; letter-spacing: .26em; text-transform: uppercase; color: var(--mist); margin-bottom: 18px; }
 .ftr ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: .92rem; }
 .ftr .hours { font-size: .9rem; }
 .ftr .hours dt { color: var(--mist); }
