@@ -711,8 +711,8 @@ html.hc .wideshot img, html.hc .about__media img { filter: grayscale(1) contrast
 @media (max-width: 760px) { .reels.reels--3 { grid-template-columns: repeat(3, 62vw); max-width: none; } }
 
 /* Touch: Farbe beim Scrollen statt Hover */
-.phone__screen img, .split__media img, .feature__media img, .tile img { transition: filter .9s ease, transform 1.4s var(--expo); }
-.is-color .phone__screen img, .is-color.jstep .jstep__media img, .is-color.about__media img, .is-color.wideshot img, .is-color.split__media img, .is-color.feature__media img, .tile.is-color img { filter: grayscale(0) contrast(1); }
+.phone__screen img { transition: filter .9s ease; }
+.phone.is-color .phone__screen img { filter: grayscale(0) contrast(1); }
 html.hc .is-color img { filter: grayscale(1) contrast(1.25) !important; }
 
 /* Rechtliches im Listen-Stil */

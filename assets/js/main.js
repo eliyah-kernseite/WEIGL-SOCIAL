@@ -236,13 +236,36 @@
   document.addEventListener("click", function (e) { if (!panel.hidden && !a11y.contains(e.target)) openPanel(false); });
   applyPrefs(); syncUI();
 
-  /* ---------- Touch-Geräte: Bilder werden beim Scrollen farbig ---------- */
-  // Ohne Maus gibt es kein Hover, deshalb färbt sich ein Bild, sobald es mittig im Bild ist
-  if (window.matchMedia("(hover: none)").matches && "IntersectionObserver" in window) {
-    var cio = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) { e.target.classList.toggle("is-color", e.isIntersecting); });
-    }, { rootMargin: "-30% 0px -30% 0px" });
-    document.querySelectorAll(".phone, .jstep, .about__media, .wideshot, .split__media, .feature__media, .tile").forEach(function (el) { cio.observe(el); });
+  /* ---------- Touch-Geräte: Reel-Handys werden beim Swipen farbig ---------- */
+  // Ohne Maus gibt es kein Hover: farbig wird das Handy, das gerade in der Mitte der Reihe steht
+  if (window.matchMedia("(hover: none)").matches) {
+    document.querySelectorAll(".reels").forEach(function (row) {
+      var phones = Array.prototype.slice.call(row.querySelectorAll(".phone"));
+      var tick = 0;
+      function update() {
+        tick = 0;
+        var rr = row.getBoundingClientRect();
+        var mid = rr.left + rr.width / 2, best = null, bestD = Infinity;
+        var inView = rr.top < innerHeight * .8 && rr.bottom > innerHeight * .2;
+        if (row.scrollWidth > row.clientWidth + 4) {
+          phones.forEach(function (p) {
+            var r = p.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - mid);
+            if (d < bestD) { bestD = d; best = p; }
+          });
+        }
+        // Liegen alle Handys nebeneinander (iPad), wandert die Farbe nacheinander durch die Reihe
+        if (!best && inView) best = phones[cycle % phones.length];
+        phones.forEach(function (p) { p.classList.toggle("is-color", inView && p === best); });
+      }
+      var cycle = 0;
+      setInterval(function () { if (row.scrollWidth <= row.clientWidth + 4 && !motionOff()) { cycle++; kick(); } }, 2200);
+      phones.forEach(function (p, i) { p.addEventListener("click", function () { cycle = i; kick(); }); });
+      function kick() { if (!tick) tick = requestAnimationFrame(update); }
+      row.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("scroll", kick, { passive: true });
+      window.addEventListener("resize", kick);
+      update();
+    });
   }
 
   /* ---------- Kontaktformular ---------- */
