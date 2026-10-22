@@ -11,6 +11,7 @@ Statische Multi-Page-Website für **www.weigl-social.de**: reines HTML, CSS und 
 | `preise.html` | Pakete Basic / Standard / Premium, einmalige Bausteine, FAQ |
 | `ueber-mich.html` | Emily Weigl, Versprechen, Region |
 | `kontakt.html` | Kontaktformular, Erreichbarkeit |
+| `social-media-*.html` | Acht Branchen-Seiten (Bau, Dachdecker, Elektriker, Sanitär & Heizung, GaLaBau, Makler, Autohäuser, Dienstleister) |
 | `impressum.html`, `datenschutz.html` | Rechtliches inkl. Bildnachweis |
 | `danke.html`, `404.html` | Bestätigungs- und Fehlerseite |
 | `kontakt.php` | Versand der Formular-Anfragen per E-Mail |

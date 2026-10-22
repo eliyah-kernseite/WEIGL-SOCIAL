@@ -236,70 +236,14 @@
   document.addEventListener("click", function (e) { if (!panel.hidden && !a11y.contains(e.target)) openPanel(false); });
   applyPrefs(); syncUI();
 
-  /* ---------- Footer: Buchstaben werden zu Folienballons ---------- */
-  var balloons = (function () {
-    var wrap = document.querySelector(".balloon");
-    var api = { refresh: function () {} };
-    if (!wrap) return api;
-    var letters = Array.prototype.slice.call(wrap.querySelectorAll(".bl"));
-    var word = wrap.querySelector(".balloon__word");
-    var filt = document.getElementById("puff");
-    var pointer = null, raf = 0, LIFE = 1500;
-
-    // Der Filter ist für 126 px Ballonschrift abgestimmt und wird auf die echte Größe umgerechnet
-    function scaleFilter() {
-      if (!filt) return;
-      var k = parseFloat(getComputedStyle(word).fontSize) * 0.74 / 126;
-      filt.querySelectorAll("[data-k]").forEach(function (el) {
-        var v = (parseFloat(el.getAttribute("data-k")) * k).toFixed(2);
-        el.setAttribute(el.tagName.toLowerCase() === "femorphology" ? "radius" : "stdDeviation", v);
-      });
-      filt.querySelectorAll("[data-ks]").forEach(function (el) { el.setAttribute("surfaceScale", (parseFloat(el.getAttribute("data-ks")) * k).toFixed(2)); });
-      filt.querySelectorAll("[data-kdy]").forEach(function (el) { el.setAttribute("dy", (parseFloat(el.getAttribute("data-kdy")) * k).toFixed(2)); });
-    }
-    function loop(now) {
-      var anyUp = false;
-      letters.forEach(function (l) {
-        if (pointer) {
-          var r = l.getBoundingClientRect();
-          var dx = pointer.x - (r.left + r.width / 2), dy = (pointer.y - (r.top + r.height / 2)) * 1.2;
-          if (Math.sqrt(dx * dx + dy * dy) < Math.max(r.width * 1.05, 60)) l._t = now;
-        }
-        var on = l._t !== undefined && now - l._t < LIFE;
-        l.classList.toggle("is-up", on);
-        if (on) anyUp = true;
-      });
-      raf = (anyUp || pointer) ? requestAnimationFrame(loop) : 0;
-    }
-    function kick() { if (!raf) raf = requestAnimationFrame(loop); }
-    function at(e) { pointer = { x: e.clientX, y: e.clientY }; kick(); }
-    wrap.addEventListener("pointermove", at);
-    wrap.addEventListener("pointerleave", function () { pointer = null; kick(); });
-    wrap.addEventListener("pointerdown", function (e) {
-      at(e);
-      if (e.pointerType !== "mouse") setTimeout(function () { pointer = null; }, 80);
-    });
-    if (window.matchMedia("(hover: none)").matches) {
-      var hintEl = wrap.querySelector(".balloon__hint");
-      if (hintEl) hintEl.textContent = "Tipp mal drauf";
-    }
-    // Einmalige Welle, sobald die Wortmarke ins Bild kommt
-    if ("IntersectionObserver" in window) {
-      var hio = new IntersectionObserver(function (en) {
-        if (!en[0].isIntersecting) return;
-        hio.disconnect();
-        if (motionOff()) return;
-        letters.forEach(function (l, i) {
-          setTimeout(function () { l._t = performance.now(); kick(); }, 250 + i * 120);
-        });
-      }, { threshold: .7 });
-      hio.observe(wrap);
-    }
-    scaleFilter();
-    window.addEventListener("resize", scaleFilter);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scaleFilter);
-    return api;
-  })();
+  /* ---------- Touch-Geräte: Bilder werden beim Scrollen farbig ---------- */
+  // Ohne Maus gibt es kein Hover, deshalb färbt sich ein Bild, sobald es mittig im Bild ist
+  if (window.matchMedia("(hover: none)").matches && "IntersectionObserver" in window) {
+    var cio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { e.target.classList.toggle("is-color", e.isIntersecting); });
+    }, { rootMargin: "-30% 0px -30% 0px" });
+    document.querySelectorAll(".phone, .jstep, .about__media, .wideshot, .split__media, .feature__media, .tile").forEach(function (el) { cio.observe(el); });
+  }
 
   /* ---------- Kontaktformular ---------- */
   var form = document.getElementById("kontaktformular");
