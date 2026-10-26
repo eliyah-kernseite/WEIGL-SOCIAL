@@ -17,6 +17,8 @@ ErrorDocument 404 /404.html
   RewriteRule ^index\.html$ / [L,R=301]
 
   # Saubere Adressen: /leistungen.html -> /leistungen (nur bei direktem Aufruf, keine Schleife)
+  # (außer der Google-Bestätigungsdatei, die muss ohne Umleitung erreichbar sein)
+  RewriteCond %{REQUEST_URI} !^/google[0-9a-f]+\.html$ [NC]
   RewriteCond %{THE_REQUEST} \s/([a-z0-9-]+)\.html[\s?] [NC]
   RewriteRule ^ /%1 [L,R=301,NE]
 
